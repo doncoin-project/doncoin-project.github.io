@@ -1,53 +1,49 @@
 
-var particleSystem = function(cfg)
-//var strokeColorPlaceholder = '#343433';
-
-{
+var particleSystem = function(cfg) {
+  
   this.initCFG(cfg);
-
   this.canvas = document.getElementById(this.canvas_id);
   this.ctx = this.canvas.getContext("2d");
-
   this.canvas.width = this.width;
-  this.canvas.height = this.height;
-
+  this.canvas.height = 500;
   this.initMessage();
 
-
-
   // create the particles, add base 2 number, higher = less particles
-  for(var i=0;i<this.area.length;i+=4096)
-  {
+  for(var i=0;i<this.area.length;i+=4096) {
 //     RANDOM COLOR
-var arr = ['#22b24c', '#cdcccc', '#343433'];
+var arr = ['#fda53d', '#cdcccc', '#343433'];
 var rand = Math.random();
 rand *= arr.length; //(5)
 rand = Math.floor(rand);
-//console.log("test" + arr[rand]);
-
-var radiusRandSizeArray = [40, 35, 30, 25];
-var randRadius= Math.random();
+var velocityArray = [0.5, 1, 1.5, 2];
+var radiusRandSizeArray = [2, 1];
+var randRadius = Math.random();
+var randVelocity = Math.random();
+randVelocity *= velocityArray.length;
+randVelocity = Math.floor(randVelocity);
 randRadius *= radiusRandSizeArray.length;
 randRadius = Math.floor(randRadius);
+var radiusHolder = 2;
 
-var radiusHolder = 25;
 if(arr[rand] == '#343433') {
 	radiusHolder = radiusRandSizeArray[randRadius];
 } else {
-	radiusHolder = 25;
+	radiusHolder = 2;
 }
 
-  
     this.particles.push(new particle({
       x: this.area[i][0],
       y: this.area[i][1],
-      vx: Math.floor((Math.random() * 2) -1),
+      vx: Math.floor((Math.random() * velocityArray[randVelocity]) -velocityArray[randVelocity]),
       vy: Math.floor((Math.random() * 2) -1),
+      //vx: Math.floor((Math.random() * 2) -1),
+      //vy: Math.floor((Math.random() * 2) -1),
       radius: radiusHolder,
       color: arr[rand],
     },this.ctx));
   }
 };
+
 
 particleSystem.prototype.initCFG = function(cfg)
 {
@@ -72,13 +68,18 @@ particleSystem.prototype.initMessage = function()
   this.str = "2764";
   this.fontStr = "400pt Helvetica Arial, sans-serif";
 
-  this.ctx.beginPath();
-  this.ctx.font = this.fontStr;
-  this.ctx.textAlign = "center";
+  //this.ctx.beginPath();
+  //this.ctx.font = this.fontStr;
+  //this.ctx.textAlign = "center";
   this.ctx.fillStyle = "#ffffff";
   //this.ctx.fillText(String.fromCharCode(parseInt(this.str, 16)),this.width/2 ,this.height - 50);
   this.ctx.fillRect(20,20,this.canvas.width,this.canvas.height);
-  this.ctx.closePath();
+  //this.ctx.closePath();
+
+// var c=document.getElementById("container");
+//     var ctx=c.getContext("2d");
+//     var img=document.getElementById("scream");
+//     ctx.drawImage(img,10,10);
 
   this.mask = this.ctx.getImageData(0,0,this.width,this.height);
   this.area = [];
@@ -153,8 +154,8 @@ var strokeColorP2 = "34,178,76"
 
 
 
-if(p1.color == '#22b24c') {
-	strokeColorP1 = "34,178,76";
+if(p1.color == '#fda53d') {
+	strokeColorP1 = "253,165,61";
 	//console.log("we have 0");
 } else if(p1.color == '#cdcccc') {
 	strokeColorP1 = "205,204,204";
@@ -164,8 +165,8 @@ if(p1.color == '#22b24c') {
 	//console.log("we have 33333333333");
 }
 
-if(p2.color == '#22b24c') {
-	strokeColorP2 = "34,178,76";
+if(p2.color == '#fda53d') {
+	strokeColorP2 = "253,165,61";
 	//console.log("we have 0");
 } else if(p2.color == '#cdcccc') {
 	strokeColorP2 = "205,204,204";
@@ -196,13 +197,14 @@ if(p2.color == '#22b24c') {
   var gradient = this.ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
   gradient.addColorStop(0, "rgba("+ strokeColorP1 +","+(1 - (Math.sqrt(this.getDistX(p1,p2) + this.getDistY(p1,p2)) / this.min_dist))+")");
   gradient.addColorStop(1, "rgba("+ strokeColorP2 +","+(1 - (Math.sqrt(this.getDistX(p1,p2) + this.getDistY(p1,p2)) / this.min_dist))+")");
+ 
   //gradient.addColorStop(1, p2.color);
-//   this.ctx.strokeStyle = gradient;
-//   this.ctx.moveTo(p1.x, p1.y);
-//   this.ctx.lineTo(p2.x, p2.y);
-//   this.ctx.lineWidth = 2
-//   this.ctx.stroke();
-//   this.ctx.closePath();
+  this.ctx.strokeStyle = gradient;
+  this.ctx.moveTo(p1.x, p1.y);
+  this.ctx.lineTo(p2.x, p2.y);
+  this.ctx.lineWidth = 1
+  this.ctx.stroke();
+  //this.ctx.closePath();
   //**end Working
 
 //copy
@@ -221,7 +223,7 @@ if(p2.color == '#22b24c') {
 
 var sP1 = (p1.radius/1.5) / Math.sqrt((p2.x-p1.x)*(p2.x-p1.x)+(p2.y-p1.y)*(p2.y-p1.y));
 var sP2 = (p2.radius/1.5) / Math.sqrt((p1.x-p2.x)*(p1.x-p2.x)+(p1.y-p2.y)*(p1.y-p2.y));
-
+/*
 //p1 perpendicular to the perpendicular
   this.ctx.beginPath();
   this.ctx.strokeStyle = "blue";
@@ -233,15 +235,31 @@ var sP2 = (p2.radius/1.5) / Math.sqrt((p1.x-p2.x)*(p1.x-p2.x)+(p1.y-p2.y)*(p1.y-
   this.ctx.moveTo(p1.x, p1.y);
   this.ctx.lineTo(p1.x-((p1.y-sP1*(p2.x-p1.x))-p1.y),p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x));
   this.ctx.lineWidth = 7;
-  this.ctx.stroke();
+  //this.ctx.stroke();
   this.ctx.closePath();
+  */
+      //p2 perpendicular to the perpendicular to the perpendicular
+//   this.ctx.beginPath();
+//   this.ctx.strokeStyle = "orange";
+//   this.ctx.lineWidth = 3;
+//   this.ctx.moveTo(p1.x-((p1.y-sP1*(p2.x-p1.x))-p1.y),p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x));
+//   //x+s*(y1-y), y-s*(x1-x)
+//   this.ctx.lineTo((p1.x-sP1*(p2.y-p1.y))+(p1.y-(p1.y-sP1*(p2.x-p1.x))),(p1.y+sP1*(p2.x-p1.x))-(p1.x-(p1.x+sP1*(p2.y-p1.y))));
+// 	this.ctx.stroke();
+//   this.ctx.closePath();
   
+  /*
 //   			p1 perpendicular to the perpendicular to the perpendicular
     this.ctx.beginPath();
   this.ctx.strokeStyle = "yellow";
+  //left
   this.ctx.moveTo((p1.x+sP1*(p2.y-p1.y))+(p1.y-(p1.y-sP1*(p2.x-p1.x))),(p1.y-sP1*(p2.x-p1.x))-(p1.x-(p1.x+sP1*(p2.y-p1.y))));
-  //this.ctx.lineTo(10,10);
-  this.ctx.lineTo(p1.x-((p1.y-sP1*(p2.x-p1.x))-p1.y),p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x));
+  //middle
+  //this.ctx.lineTo(p1.x-((p1.y-sP1*(p2.x-p1.x))-p1.y),p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x));
+  //right
+  this.ctx.lineTo((p1.x-sP1*(p2.y-p1.y))+(p1.y-(p1.y-sP1*(p2.x-p1.x))),(p1.y+sP1*(p2.x-p1.x))-(p1.x-(p1.x+sP1*(p2.y-p1.y))));
+  // this.ctx.lineTo((x+(y1-y),y-(x1-x)));
+  
   //this.ctx.lineTo(p1.x-((p1.y-sP1*(p2.x-p1.x))-p1.y))-(p1.y-(p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x))),(p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x))+(((p1.x+sP1*(p2.y-p1.y))+(p1.y-(p1.y-sP1*(p2.x-p1.x))))-(p1.x-((p1.y-sP1*(p2.x-p1.x))-p1.y))));
 //   			this.ctx.lineTo((p1.x-((p1.y-sP1*(p2.x-p1.x))-p1.y)) + (p1.y - p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x)), p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x) - (p1.x - (p1.y-sP1*(p2.x-p1.x))-p1.y));
 //   			(x,y)->(x+(y1-y),y-(x1-x))
@@ -252,18 +270,38 @@ var sP2 = (p2.radius/1.5) / Math.sqrt((p1.x-p2.x)*(p1.x-p2.x)+(p1.y-p2.y)*(p1.y-
 
   //this.ctx.lineTo((p1.x+sP1*(p2.y-p1.y))-(p1.y-(p1.y-sP1*(p2.x-p1.x))),(p1.y-sP1*(p2.x-p1.x))+(p1.x-(p1.x+sP1*(p2.y-p1.y))));
   this.ctx.lineWidth = 1;
-  this.ctx.stroke();
+  //this.ctx.stroke();
   this.ctx.closePath();
+  */
   
-  //p2 perpendicular to the perpendicular to the perpendicular
-  this.ctx.beginPath();
-  this.ctx.strokeStyle = "orange";
-  this.ctx.lineWidth = 3;
-  this.ctx.moveTo(p1.x-((p1.y-sP1*(p2.x-p1.x))-p1.y),p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x));
-  this.ctx.lineTo((p1.x-((p1.y-sP1*(p2.x-p1.x))-p1.y))+(p1.y-p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x)),(p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x))-(p1.x-p1.x-((p1.y-sP1*(p2.x-p1.x))-p1.y)));
-    this.ctx.stroke();
+  
+  
+  /*
+  //P2 PERPENDICULAR YELLOW
+      this.ctx.beginPath();
+  this.ctx.strokeStyle = "PINK";
+  //left
+  this.ctx.moveTo((p2.x+sP2*(p1.y-p2.y))+(p2.y-(p2.y-sP2*(p1.x-p2.x))),(p2.y-sP2*(p1.x-p2.x))-(p2.x-(p2.x+sP2*(p1.y-p2.y))));
+  //middle
+  //this.ctx.lineTo(p1.x-((p1.y-sP1*(p2.x-p1.x))-p1.y),p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x));
+  //right
+  this.ctx.lineTo((p2.x-sP2*(p1.y-p2.y))+(p2.y-(p2.y-sP2*(p1.x-p2.x))),(p2.y+sP2*(p1.x-p2.x))-(p2.x-(p2.x+sP2*(p1.y-p2.y))));
+  // this.ctx.lineTo((x+(y1-y),y-(x1-x)));
+  
+  //this.ctx.lineTo(p1.x-((p1.y-sP1*(p2.x-p1.x))-p1.y))-(p1.y-(p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x))),(p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x))+(((p1.x+sP1*(p2.y-p1.y))+(p1.y-(p1.y-sP1*(p2.x-p1.x))))-(p1.x-((p1.y-sP1*(p2.x-p1.x))-p1.y))));
+//   			this.ctx.lineTo((p1.x-((p1.y-sP1*(p2.x-p1.x))-p1.y)) + (p1.y - p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x)), p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x) - (p1.x - (p1.y-sP1*(p2.x-p1.x))-p1.y));
+//   			(x,y)->(x+(y1-y),y-(x1-x))
+//   this.ctx.moveTo(p1.x-((p1.y-sP1*(p2.x-p1.x))-p1.y),p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x));
+//   			this.ctx.lineTo(p1.x-((p1.y-sP1*(p2.x-p1.x))-p1.y)+(p1.y-p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x)), p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x)-(p1.x-(p1.y-sP1*(p2.x-p1.x))-p1.y)));
+//   this.ctx.lineTo(x+(y1-y),y-(x1-x));
+//   			this.ctx.lineTo(100, p1.y);
+
+  //this.ctx.lineTo((p1.x+sP1*(p2.y-p1.y))-(p1.y-(p1.y-sP1*(p2.x-p1.x))),(p1.y-sP1*(p2.x-p1.x))+(p1.x-(p1.x+sP1*(p2.y-p1.y))));
+  this.ctx.lineWidth = 5;
+  //this.ctx.stroke();
   this.ctx.closePath();
-  
+*/  
+/*
 				//P1 perpendiculars
   this.ctx.beginPath();
   this.ctx.strokeStyle = "#FF0000";
@@ -277,9 +315,10 @@ var sP2 = (p2.radius/1.5) / Math.sqrt((p1.x-p2.x)*(p1.x-p2.x)+(p1.y-p2.y)*(p1.y-
   //this.ctx.lineTo((p1.x+sP1*(p2.y-p1.y))+(p1.y-(p1.y-sP1*(p2.x-p1.x))),(p1.y-sP1*(p2.x-p1.x))-(p1.x-(p1.x+sP1*(p2.y-p1.y))));
   //this.ctx.lineTo(p1.x+sP1*(p2.y-p1.y)+(p1.y-p1.y-sP1*(p2.x-p1.x)),p1.y-sP1*(p2.x-p1.x)-(p1.x-p1.x+sP1*(p2.y-p1.y)));
   this.ctx.lineWidth = 1;
-  this.ctx.stroke();
+  //this.ctx.stroke();
   this.ctx.closePath();
-  
+  */
+  /*
   				//P2 perpendiculars
   this.ctx.beginPath();
   this.ctx.strokeStyle = "green";
@@ -292,24 +331,71 @@ var sP2 = (p2.radius/1.5) / Math.sqrt((p1.x-p2.x)*(p1.x-p2.x)+(p1.y-p2.y)*(p1.y-
 //   				//working: this.ctx.lineTo((p1.x - ((p2.y)-(p1.y))), ((p1.y) + ((p2.x)-(p1.x))));
   this.ctx.lineTo(p2.x-sP2*(p1.y-p2.y), p2.y+sP2*(p1.x-p2.x));
   this.ctx.lineWidth = 1;
-  this.ctx.stroke();
+  //this.ctx.stroke();
   this.ctx.closePath();
+  */
+  
+
+  
+  
   
   				// bezierCurveTo
-  this.ctx.beginPath();
-  this.ctx.strokeStyle = gradient;
-  this.ctx.fillStyle = gradient;
-  this.ctx.moveTo(p1.x+sP1*(p2.y-p1.y), p1.y-sP1*(p2.x-p1.x));
-  this.ctx.lineTo(p1.x, p1.y);
-  this.ctx.lineTo(p1.x-sP1*(p2.y-p1.y), p1.y+sP1*(p2.x-p1.x));
-  this.ctx.bezierCurveTo(p1.x, p1.y,p2.x, p2.y,p2.x+sP2*(p1.y-p2.y), p2.y-sP2*(p1.x-p2.x));
-  this.ctx.lineTo(p2.x, p2.y);
-  this.ctx.lineTo(p2.x-sP2*(p1.y-p2.y), p2.y+sP2*(p1.x-p2.x));
-  this.ctx.bezierCurveTo(p2.x, p2.y,p1.x, p1.y,p1.x+sP1*(p2.y-p1.y), p1.y-sP1*(p2.x-p1.x));
-  this.ctx.lineWidth = 5;
+//   this.ctx.beginPath();
+//   this.ctx.strokeStyle = gradient;
+//   this.ctx.fillStyle = gradient;
+//   this.ctx.moveTo(p1.x+sP1*(p2.y-p1.y), p1.y-sP1*(p2.x-p1.x));
+//   this.ctx.lineTo(p1.x, p1.y);
+//   this.ctx.lineTo(p1.x-sP1*(p2.y-p1.y), p1.y+sP1*(p2.x-p1.x));
+//   this.ctx.bezierCurveTo(p1.x, p1.y,p2.x, p2.y,p2.x+sP2*(p1.y-p2.y), p2.y-sP2*(p1.x-p2.x));
+//   this.ctx.lineTo(p2.x, p2.y);
+//   this.ctx.lineTo(p2.x-sP2*(p1.y-p2.y), p2.y+sP2*(p1.x-p2.x));
+//   this.ctx.bezierCurveTo(p2.x, p2.y,p1.x, p1.y,p1.x+sP1*(p2.y-p1.y), p1.y-sP1*(p2.x-p1.x));
+//   this.ctx.lineWidth = 5;
+//   			//this.ctx.stroke();
+//   				this.ctx.fill();
+//   this.ctx.closePath();
+  
+  
+  
+  //NEW ADJUSTED BEZIER - works
+// 	this.ctx.beginPath();
+//   this.ctx.strokeStyle = gradient;
+//   this.ctx.fillStyle = gradient;
+//   			//convex
+// 			//   this.ctx.moveTo((p2.x+sP2*(p1.y-p2.y))+(p2.y-(p2.y-sP2*(p1.x-p2.x))),(p2.y-sP2*(p1.x-p2.x))-(p2.x-(p2.x+sP2*(p1.y-p2.y))));
+// 			//   this.ctx.bezierCurveTo(p1.x-((p1.y-sP1*(p2.x-p1.x))-p1.y),p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x),p2.x-((p2.y-sP2*(p1.x-p2.x))-p2.y),p2.y+(p2.x+sP2*(p1.y-p2.y)-p2.x),(p1.x-sP1*(p2.y-p1.y))+(p1.y-(p1.y-sP1*(p2.x-p1.x))),(p1.y+sP1*(p2.x-p1.x))-(p1.x-(p1.x+sP1*(p2.y-p1.y))));
+// 			//concave
+//   this.ctx.moveTo((p2.x+sP2*(p1.y-p2.y))+(p2.y-(p2.y-sP2*(p1.x-p2.x))),(p2.y-sP2*(p1.x-p2.x))-(p2.x-(p2.x+sP2*(p1.y-p2.y))));
+//   this.ctx.bezierCurveTo(p2.x-((p2.y-sP2*(p1.x-p2.x))-p2.y),p2.y+(p2.x+sP2*(p1.y-p2.y)-p2.x),p1.x-((p1.y-sP1*(p2.x-p1.x))-p1.y),p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x),(p1.x-sP1*(p2.y-p1.y))+(p1.y-(p1.y-sP1*(p2.x-p1.x))),(p1.y+sP1*(p2.x-p1.x))-(p1.x-(p1.x+sP1*(p2.y-p1.y))));
+//   this.ctx.lineTo((p1.x+sP1*(p2.y-p1.y))+(p1.y-(p1.y-sP1*(p2.x-p1.x))),(p1.y-sP1*(p2.x-p1.x))-(p1.x-(p1.x+sP1*(p2.y-p1.y))));
+//   this.ctx.bezierCurveTo(p1.x-((p1.y-sP1*(p2.x-p1.x))-p1.y),p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x),p2.x-((p2.y-sP2*(p1.x-p2.x))-p2.y),p2.y+(p2.x+sP2*(p1.y-p2.y)-p2.x),(p2.x-sP2*(p1.y-p2.y))+(p2.y-(p2.y-sP2*(p1.x-p2.x))),(p2.y+sP2*(p1.x-p2.x))-(p2.x-(p2.x+sP2*(p1.y-p2.y))));
+//   this.ctx.lineWidth = 3;
+//   			//this.ctx.stroke();
+//   				this.ctx.fill();
+//   this.ctx.closePath();
+  
+  
+  
+    //NEW ADJUSTED BEZIER - remove double overlap
+	
+	//this.ctx.beginPath();
+  //this.ctx.strokeStyle = gradient;
+  //this.ctx.fillStyle = gradient;
+  			//convex
+//   this.ctx.moveTo((p2.x+sP2*(p1.y-p2.y))+(p2.y-(p2.y-sP2*(p1.x-p2.x))),(p2.y-sP2*(p1.x-p2.x))-(p2.x-(p2.x+sP2*(p1.y-p2.y))));
+//   this.ctx.bezierCurveTo(p1.x-((p1.y-sP1*(p2.x-p1.x))-p1.y),p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x),p2.x-((p2.y-sP2*(p1.x-p2.x))-p2.y),p2.y+(p2.x+sP2*(p1.y-p2.y)-p2.x),(p1.x-sP1*(p2.y-p1.y))+(p1.y-(p1.y-sP1*(p2.x-p1.x))),(p1.y+sP1*(p2.x-p1.x))-(p1.x-(p1.x+sP1*(p2.y-p1.y))));
+			//concave
+  //this.ctx.moveTo((p2.x+sP2*(p1.y-p2.y))+(p2.y-(p2.y-sP2*(p1.x-p2.x))),(p2.y-sP2*(p1.x-p2.x))-(p2.x-(p2.x+sP2*(p1.y-p2.y))));
+  //this.ctx.bezierCurveTo(p2.x-((p2.y-sP2*(p1.x-p2.x))-p2.y),p2.y+(p2.x+sP2*(p1.y-p2.y)-p2.x),p1.x-((p1.y-sP1*(p2.x-p1.x))-p1.y),p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x),(p1.x-sP1*(p2.y-p1.y))+(p1.y-(p1.y-sP1*(p2.x-p1.x))),(p1.y+sP1*(p2.x-p1.x))-(p1.x-(p1.x+sP1*(p2.y-p1.y))));
+  //this.ctx.lineTo((p1.x+sP1*(p2.y-p1.y))+(p1.y-(p1.y-sP1*(p2.x-p1.x))),(p1.y-sP1*(p2.x-p1.x))-(p1.x-(p1.x+sP1*(p2.y-p1.y))));
+  //this.ctx.bezierCurveTo(p1.x-((p1.y-sP1*(p2.x-p1.x))-p1.y),p1.y+(p1.x+sP1*(p2.y-p1.y)-p1.x),p2.x-((p2.y-sP2*(p1.x-p2.x))-p2.y),p2.y+(p2.x+sP2*(p1.y-p2.y)-p2.x),(p2.x-sP2*(p1.y-p2.y))+(p2.y-(p2.y-sP2*(p1.x-p2.x))),(p2.y+sP2*(p1.x-p2.x))-(p2.x-(p2.x+sP2*(p1.y-p2.y))));
+  //this.ctx.lineTo((p2.x-sP2*(p1.y-p2.y))+(p2.y-(p2.y-sP2*(p1.x-p2.x))),(p2.y+sP2*(p1.x-p2.x))-(p2.x-(p2.x+sP2*(p1.y-p2.y))));
+  //this.ctx.lineWidth = 3;
   //this.ctx.stroke();
-  				this.ctx.fill();
+  //				this.ctx.fill();
   this.ctx.closePath();
+  
+  
 };
 
 
@@ -400,6 +486,8 @@ window.delegate=function(ctx,func)
 {
   return function() { return func.apply(ctx,arguments); };
 };
+
+
 
 window.requestAnimFrame = (function(){
   return  window.requestAnimationFrame       || 

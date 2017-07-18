@@ -4,14 +4,52 @@
     <title>Particles</title>
     <script type="text/javascript" src="js/particle.js"></script>
     <script type="text/javascript" src="js/particle_system.js"></script>
+    <script type="text/javascript" src="js/particle_system2.js"></script>
   </head>
 
-  <body>
-    <canvas id="container"></canvas>
-    <script type="text/javascript">
+  <body onload="load()">
+  	
+    <canvas id="container" style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
+    <canvas id="container2" width="1000" height="1000" style="position: absolute; left: 1000; top: 200; z-index: 1;"></canvas>
+    <script type="text/javascript" >
       var system = new particleSystem({"canvas_id":"container"});
       system.start();
+      
+      
+      
+      function loadImages(sources, callback) {
+        var images = {};
+        var loadedImages = 0;
+        var numImages = 0;
+        // get num of sources
+        for(var src in sources) {
+          numImages++;
+        }
+        for(var src in sources) {
+          images[src] = new Image();
+          images[src].onload = function() {
+            if(++loadedImages >= numImages) {
+              callback(images);
+            }
+          };
+          images[src].src = sources[src];
+        }
+      }
+      var canvas = document.getElementById('container2');
+      var context = canvas.getContext('2d');
+
+      var sources = {
+        darthVader: 'http://i.imgur.com/kZjhcdn.png'
+      };
+
+      loadImages(sources, function(images) {
+        context.drawImage(images.darthVader, 400, 150, 250, 250);
+      });
+      
+      
+      
     </script>
+    </div>
   </body>
 
 </html>
